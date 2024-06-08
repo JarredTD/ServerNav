@@ -1,0 +1,3 @@
+[workspace]
+resolver = "2"
+members = ["server_nav_bin", "server_nav_gui"]
