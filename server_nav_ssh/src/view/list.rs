@@ -23,7 +23,7 @@ pub fn list_dir(
 }
 
 //TODO Untested, modifying files over session to be implemented later
-pub fn read_file(session: &Session, filepath: &str) -> Result<String, String> {
+pub fn read_file(session: &Session, filepath: &PathBuf) -> Result<String, String> {
     let sftp = session
         .sftp()
         .map_err(|e| format!("Failed to create SFTP session: {}", e))?;

@@ -7,13 +7,16 @@ use eframe::egui::{self};
 use ssh2::Session;
 use std::path::PathBuf;
 
+use super::panels::file::show_file;
+
 #[derive(Default)]
 pub struct ServerNavApp {
     pub address: String,
     pub username: String,
     pub password: String,
     pub message: String,
-    pub current_wd: PathBuf,
+    pub current_wd: Option<PathBuf>,
+    pub current_file: Option<PathBuf>,
     pub show_popup: bool,
     pub show_hidden_files: bool,
     pub session: Option<Session>,
@@ -38,6 +41,8 @@ impl eframe::App for ServerNavApp {
         show_connection_menu(ctx, self);
         // File Tree
         show_file_tree(ctx, self);
+        // File
+        show_file(ctx, self);
         // Messages
         show_messages(ctx, self)
     }

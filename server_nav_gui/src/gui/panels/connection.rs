@@ -2,7 +2,7 @@ use crate::gui::app::ServerNavApp;
 use eframe::egui::{self, Context};
 use server_nav_ssh::connection::connect::connect_to_ssh;
 use server_nav_ssh::connection::disconnect::disconnect_ssh;
-use server_nav_ssh::view::list::{get_working_dir, list_dir};
+use server_nav_ssh::view::list::get_working_dir;
 
 pub fn show_connection_menu(ctx: &Context, app: &mut ServerNavApp) {
     if app.show_popup {
@@ -55,7 +55,7 @@ pub fn show_connection_menu(ctx: &Context, app: &mut ServerNavApp) {
                         if let Some(session) = &app.session {
                             match get_working_dir(session) {
                                 Ok(wd) => {
-                                    app.current_wd = wd.clone();
+                                    app.current_wd = Some(wd);
                                 }
                                 Err(err) => {
                                     app.message = err;

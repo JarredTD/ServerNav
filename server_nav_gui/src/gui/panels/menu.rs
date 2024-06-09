@@ -1,7 +1,6 @@
 use crate::gui::app::ServerNavApp;
 use eframe::egui::{self, Context, Visuals};
 use server_nav_ssh::connection::disconnect::disconnect_ssh;
-use std::path::PathBuf;
 
 pub fn show_menu(ctx: &Context, app: &mut ServerNavApp) {
     egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
@@ -11,7 +10,8 @@ pub fn show_menu(ctx: &Context, app: &mut ServerNavApp) {
                     app.show_popup = true
                 }
                 if ui.button("Disconnect").clicked() {
-                    app.current_wd = PathBuf::new();
+                    app.current_wd = None;
+                    app.current_file = None;
                     match disconnect_ssh(app.session.take()) {
                         Ok(msg) => app.message = msg,
                         Err(err) => app.message = err,
