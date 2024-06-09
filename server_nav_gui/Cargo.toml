@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 eframe = "0.27.2"
+server_nav_ssh = { path = "../server_nav_ssh" }
+ssh2 = "0.9.4"
