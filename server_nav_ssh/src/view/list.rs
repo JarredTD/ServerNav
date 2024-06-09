@@ -2,6 +2,7 @@ use ssh2::Session;
 use std::io::Read;
 use std::path::Path;
 
+//TODO: Differentiate between files and directories for the return
 pub fn list_dir(session: &Session, directory: &str) -> Result<Vec<String>, String> {
     let sftp = session
         .sftp()
@@ -19,6 +20,7 @@ pub fn list_dir(session: &Session, directory: &str) -> Result<Vec<String>, Strin
     Ok(filenames)
 }
 
+//TODO Untested, modifying files over session to be implemented later
 pub fn read_file(session: &Session, filepath: &str) -> Result<String, String> {
     let sftp = session
         .sftp()

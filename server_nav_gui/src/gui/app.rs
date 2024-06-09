@@ -1,4 +1,4 @@
-use eframe::egui::{self, CentralPanel, Visuals};
+use eframe::egui::{self, Visuals};
 use server_nav_ssh::connection::connect::connect_to_ssh;
 use server_nav_ssh::connection::disconnect::disconnect_ssh;
 use server_nav_ssh::view::list::{get_working_dir, list_dir};
@@ -17,7 +17,7 @@ pub struct ServerNavApp {
 }
 
 impl ServerNavApp {
-    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+    pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         // Customize egui here with cc.egui_ctx.set_fonts and cc.egui_ctx.set_visuals.
         // Restore app state using cc.storage (requires the "persistence" feature).
         // Use the cc.gl (a glow::Context) to create graphics shaders and buffers that you can use
@@ -27,7 +27,8 @@ impl ServerNavApp {
 }
 
 impl eframe::App for ServerNavApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    //TODO Refactor into smaller functions
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Menu Bar
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
@@ -37,10 +38,16 @@ impl eframe::App for ServerNavApp {
                     }
                     if ui.button("Disconnect").clicked() {
                         self.current_wd = String::from("");
-                        disconnect_ssh(self.session.take(), &mut self.message);
+                        match disconnect_ssh(self.session.take()) {
+                            Ok(msg) => self.message = msg,
+                            Err(err) => self.message = err,
+                        }
                     }
                     if ui.button("Quit").clicked() {
-                        disconnect_ssh(self.session.take(), &mut self.message);
+                        match disconnect_ssh(self.session.take()) {
+                            Ok(_) => self.message = "".to_string(),
+                            Err(err) => self.message = err,
+                        }
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
@@ -85,15 +92,32 @@ impl eframe::App for ServerNavApp {
                             ui.add(egui::TextEdit::singleline(&mut self.password).password(true));
                         });
                         if ui.button("Connect").clicked() {
-                            disconnect_ssh(self.session.take(), &mut self.message);
+                            match disconnect_ssh(self.session.take()) {
+                                Ok(msg) => self.message = msg,
+                                Err(err) => self.message = err,
+                            }
 
                             let full_address = format!("{}:22", self.address);
-                            self.session = connect_to_ssh(
+                            self.session = match connect_to_ssh(
                                 full_address.as_str(),
                                 &self.username,
                                 &self.password,
-                                &mut self.message,
-                            );
+                            ) {
+                                Ok(Some(session)) => {
+                                    self.message =
+                                        format!("Successfully connected to {}", self.address);
+                                    Some(session)
+                                }
+                                Ok(None) => {
+                                    self.message =
+                                        format!("No connection made to {}", self.address);
+                                    None
+                                }
+                                Err(err) => {
+                                    self.message = err.to_string();
+                                    None
+                                }
+                            };
                             self.show_popup = false;
                         }
                         if ui.button("Cancel").clicked() {
@@ -103,7 +127,11 @@ impl eframe::App for ServerNavApp {
                 });
         }
         egui::SidePanel::left("File Tree").show(ctx, |ui| {
-            ui.heading((&self.current_wd));
+            ui.label(
+                egui::RichText::new(&self.current_wd)
+                    .text_style(egui::TextStyle::Body)
+                    .strong(),
+            );
             egui::ScrollArea::vertical().show(ui, |ui| {
                 if let Some(session) = &self.session {
                     let working_directory = match get_working_dir(session) {
