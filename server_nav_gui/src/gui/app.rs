@@ -1,4 +1,6 @@
-use eframe::egui::{self, Visuals};
+use std::path::{Path, PathBuf};
+
+use eframe::egui::{self, Label, Sense, Visuals};
 use server_nav_ssh::connection::connect::connect_to_ssh;
 use server_nav_ssh::connection::disconnect::disconnect_ssh;
 use server_nav_ssh::view::list::{get_working_dir, list_dir};
@@ -10,7 +12,7 @@ pub struct ServerNavApp {
     username: String,
     password: String,
     message: String,
-    current_wd: String,
+    current_wd: PathBuf,
     show_popup: bool,
     show_hidden_files: bool,
     session: Option<Session>,
@@ -37,7 +39,7 @@ impl eframe::App for ServerNavApp {
                         self.show_popup = true
                     }
                     if ui.button("Disconnect").clicked() {
-                        self.current_wd = String::from("");
+                        self.current_wd = PathBuf::new();
                         match disconnect_ssh(self.session.take()) {
                             Ok(msg) => self.message = msg,
                             Err(err) => self.message = err,
@@ -118,6 +120,16 @@ impl eframe::App for ServerNavApp {
                                     None
                                 }
                             };
+                            if let Some(session) = &self.session {
+                                match get_working_dir(session) {
+                                    Ok(wd) => {
+                                        self.current_wd = wd.clone();
+                                    }
+                                    Err(err) => {
+                                        self.message = err;
+                                    }
+                                };
+                            }
                             self.show_popup = false;
                         }
                         if ui.button("Cancel").clicked() {
@@ -126,44 +138,78 @@ impl eframe::App for ServerNavApp {
                     });
                 });
         }
-        egui::SidePanel::left("File Tree").show(ctx, |ui| {
-            ui.label(
-                egui::RichText::new(&self.current_wd)
-                    .text_style(egui::TextStyle::Body)
-                    .strong(),
-            );
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                if let Some(session) = &self.session {
-                    let working_directory = match get_working_dir(session) {
-                        Ok(wd) => {
-                            self.current_wd = wd.clone();
-                            wd
-                        }
-                        Err(err) => {
-                            self.message = err;
-                            String::new()
-                        }
-                    };
-
-                    let files = match list_dir(session, &working_directory) {
-                        Ok(files) => files,
+        if let Some(session) = &self.session {
+            egui::SidePanel::left("File Tree").show(ctx, |ui| {
+                ui.label(
+                    egui::RichText::new(&self.current_wd.to_string_lossy().to_string())
+                        .text_style(egui::TextStyle::Small)
+                        .strong(),
+                );
+                if ui.button("<<").clicked() {
+                    let current_path = Path::new(&self.current_wd);
+                    if let Some(parent) = current_path.parent() {
+                        self.current_wd = match parent.canonicalize() {
+                            Ok(parent_path) => parent_path,
+                            Err(err) => {
+                                self.message = format!("Failed to resolve path: {}", err);
+                                self.current_wd.clone()
+                            }
+                        };
+                        self.message = format!(
+                            "Moved up to: {}",
+                            self.current_wd.to_string_lossy().to_string()
+                        );
+                    } else {
+                        self.message = "Already at the root directory".to_string();
+                    }
+                }
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    let paths = match list_dir(session, &self.current_wd) {
+                        Ok(paths) => paths,
                         Err(err) => {
                             self.message = err;
                             Vec::new()
                         }
                     };
 
-                    for file in &files {
+                    let current_dir_clone = self.current_wd.clone();
+                    for (path, stat) in &paths {
+                        let file_name = match path.file_name() {
+                            Some(name) => name.to_string_lossy().to_string(),
+                            None => continue,
+                        };
+
                         if !self.show_hidden_files {
-                            if file.starts_with(".") {
+                            if file_name.starts_with(".") {
                                 continue;
                             }
                         }
-                        ui.label(file.as_str());
+                        if path == Path::new(&current_dir_clone) {
+                            continue;
+                        }
+
+                        if ui
+                            .add(Label::new(file_name).sense(Sense::click()))
+                            .clicked()
+                        {
+                            if stat.is_dir() {
+                                match path.canonicalize() {
+                                    Ok(full_path) => {
+                                        self.current_wd = full_path;
+                                    }
+                                    Err(err) => {
+                                        self.message = format!("Failed to resolve path: {}", err)
+                                    }
+                                }
+                            } else {
+                                self.message =
+                                    format!("{} is a file", path.to_string_lossy().to_string())
+                            }
+                        }
                     }
-                }
+                });
             });
-        });
+        }
 
         // BottomPanel
         egui::TopBottomPanel::bottom("bottom_panel").show(ctx, |ui| {
