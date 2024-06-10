@@ -20,22 +20,18 @@ pub fn connect_to_ssh(
 
                 if sess.userauth_password(username, password).is_ok() {
                     if sess.authenticated() {
-                        return Ok(Some(sess));
+                        Ok(Some(sess))
                     } else {
-                        return Err(format!("Authentication failed to {}", address));
+                        Err(format!("Authentication failed to {}", address))
                     }
                 } else {
-                    return Err(
-                        "Failed to authenticate with the given username and password.".to_string(),
-                    );
+                    Err("Failed to authenticate with the given username and password.".to_string())
                 }
             }
-            Err(e) => {
-                return Err(format!("Failed to connect to '{}': {}", address, e));
-            }
+            Err(e) => Err(format!("Failed to connect to '{}': {}", address, e)),
         }
     } else {
-        return Err(format!("Failed to resolve address: {}", address));
+        Err(format!("Failed to resolve address: {}", address))
     }
 }
 

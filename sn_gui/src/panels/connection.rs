@@ -5,7 +5,7 @@ use sn_ssh::file_ops::get_working_dir;
 
 impl ServerNavApp {
     pub fn show_connection_menu(&mut self, ctx: &Context) {
-        if self.show_popup || !self.session.is_some() {
+        if self.show_popup || self.session.is_none() {
             egui::Window::new("New Connection")
                 .collapsible(false)
                 .resizable(false)

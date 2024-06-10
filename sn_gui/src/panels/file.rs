@@ -2,7 +2,7 @@ use crate::app::ServerNavApp;
 use eframe::egui::{self, CentralPanel, Context, ScrollArea};
 use egui_extras::syntax_highlighting::{highlight, CodeTheme};
 use sn_ssh::file_ops::read_file;
-use std::path::PathBuf;
+use std::path::Path;
 
 impl ServerNavApp {
     pub fn show_file(&mut self, ctx: &Context) {
@@ -18,11 +18,8 @@ impl ServerNavApp {
                         self.file_content = Some(contents);
                     }
                     Err(err) => {
-                        self.message = format!(
-                            "Unable to read {}: {}",
-                            current_file.to_string_lossy().to_string(),
-                            err
-                        );
+                        self.message =
+                            format!("Unable to read {}: {}", current_file.display(), err);
                         self.current_file = None;
                     }
                 }
@@ -48,7 +45,7 @@ impl ServerNavApp {
     }
 }
 
-fn get_language(file: &PathBuf) -> String {
+fn get_language(file: &Path) -> String {
     match file.extension().and_then(|ext| ext.to_str()) {
         Some("rs") => "rust",
         Some("c") | Some("h") => "c",

@@ -9,7 +9,7 @@ impl ServerNavApp {
             egui::SidePanel::left("File Tree").show(ctx, |ui| {
                 if let Some(current_wd) = &self.current_wd.clone() {
                     ui.label(
-                        egui::RichText::new(&current_wd.to_string_lossy().to_string())
+                        egui::RichText::new(current_wd.to_string_lossy().to_string())
                             .text_style(egui::TextStyle::Small)
                             .strong(),
                     );
@@ -25,11 +25,7 @@ impl ServerNavApp {
                             };
                             self.message = format!(
                                 "Moved up to: {}",
-                                self.current_wd
-                                    .as_ref()
-                                    .unwrap()
-                                    .to_string_lossy()
-                                    .to_string()
+                                self.current_wd.as_ref().unwrap().display()
                             );
                         } else {
                             self.message = "Already at the root directory".to_string();
@@ -52,7 +48,7 @@ impl ServerNavApp {
                                 None => continue,
                             };
 
-                            if !self.show_hidden_files && file_name.starts_with(".") {
+                            if !self.show_hidden_files && file_name.starts_with('.') {
                                 continue;
                             }
                             if path == Path::new(&current_dir_clone) {
