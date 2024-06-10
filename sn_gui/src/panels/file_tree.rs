@@ -73,7 +73,8 @@ impl ServerNavApp {
                                 if stat.is_dir() {
                                     self.current_wd = Some(full_path)
                                 } else if stat.is_file() {
-                                    self.current_file = Some(full_path)
+                                    self.current_file = Some(full_path);
+                                    self.file_content = None;
                                 }
                             }
                         }
