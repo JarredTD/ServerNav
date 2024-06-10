@@ -22,7 +22,6 @@ pub fn list_dir(
     Ok(paths)
 }
 
-//TODO Untested, modifying files over session to be implemented later
 pub fn read_file(session: &Session, filepath: &PathBuf) -> Result<String, String> {
     let sftp = session
         .sftp()
@@ -47,4 +46,25 @@ pub fn get_working_dir(session: &Session) -> Result<PathBuf, String> {
         .map_err(|e| format!("Failed to get PWD: {}", e))?;
 
     Ok(pwd)
+}
+
+// Placeholder functions for future file operations
+pub fn modify_file(_session: &Session, _filepath: &PathBuf, _content: &str) -> Result<(), String> {
+    unimplemented!("Functionality to modify files over session is not implemented yet.");
+}
+
+pub fn export_file(
+    _session: &Session,
+    _local_path: &PathBuf,
+    _remote_path: &PathBuf,
+) -> Result<(), String> {
+    unimplemented!("Functionality to export files is not implemented yet.");
+}
+
+pub fn import_file(
+    _session: &Session,
+    _remote_path: &PathBuf,
+    _local_path: &PathBuf,
+) -> Result<(), String> {
+    unimplemented!("Functionality to import files is not implemented yet.");
 }

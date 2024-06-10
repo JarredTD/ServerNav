@@ -1,5 +1,5 @@
 use eframe;
-use server_nav_gui::gui::app::ServerNavApp;
+use sn_gui::app::ServerNavApp;
 
 fn main() {
     let native_options = eframe::NativeOptions::default();

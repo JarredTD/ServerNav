@@ -1,5 +1,5 @@
 [package]
-name = "server_nav_bin"
+name = "sn_gui"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 eframe = "0.27.2"
-server_nav_gui = { path = "../server_nav_gui" }
+egui_extras = "0.27.2"
+sn_ssh = { path = "../sn_ssh" }
+ssh2 = "0.9.4"

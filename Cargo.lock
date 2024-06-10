@@ -2525,31 +2525,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "server_nav_bin"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "server_nav_gui",
-]
-
-[[package]]
-name = "server_nav_gui"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "egui_extras",
- "server_nav_ssh",
- "ssh2",
-]
-
-[[package]]
-name = "server_nav_ssh"
-version = "0.1.0"
-dependencies = [
- "ssh2",
-]
-
-[[package]]
 name = "sha1"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2642,6 +2617,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd538fb6910ac1099850255cf94a94df6551fbdd602454387d0adb2d1ca6dead"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "sn_app"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "sn_gui",
+]
+
+[[package]]
+name = "sn_gui"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "egui_extras",
+ "sn_ssh",
+ "ssh2",
+]
+
+[[package]]
+name = "sn_ssh"
+version = "0.1.0"
+dependencies = [
+ "ssh2",
 ]
 
 [[package]]
