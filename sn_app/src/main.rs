@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use eframe;
 use sn_gui::app::ServerNavApp;
 
