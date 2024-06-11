@@ -13,9 +13,11 @@ pub struct ServerNavApp {
     pub current_file: Option<PathBuf>,
     pub file_text_buffer: TextBuffer,
     pub temp_text_buffer: String,
-    pub show_popup: bool,
+    pub show_connection_popup: bool,
+    pub show_import_popup: bool,
     pub show_hidden_files: bool,
     pub session: Option<Session>,
+    pub selected_import_path: Option<PathBuf>,
 }
 
 impl ServerNavApp {
@@ -27,13 +29,17 @@ impl ServerNavApp {
         // Menu Bar
         self.show_menu(ctx);
         // Connection Popup
-        self.show_connection_menu(ctx);
+        if self.show_connection_popup || self.session.is_none() {
+            self.show_connection_menu(ctx);
+        }
+        // Import Popup
+        if self.show_import_popup {
+            self.show_import_menu(ctx)
+        }
         // File Tree
         self.show_file_tree(ctx);
         // File
         self.show_file(ctx);
-        // File operations
-        self.show_file_options(ctx);
         // Messages
         self.show_messages(ctx);
     }
