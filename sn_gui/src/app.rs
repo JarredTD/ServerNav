@@ -1,4 +1,5 @@
 use eframe::egui::{self};
+use sn_ssh::buffer::text_buffer::TextBuffer;
 use ssh2::Session;
 use std::path::PathBuf;
 
@@ -10,7 +11,8 @@ pub struct ServerNavApp {
     pub message: String,
     pub current_wd: Option<PathBuf>,
     pub current_file: Option<PathBuf>,
-    pub file_content: Option<String>,
+    pub file_text_buffer: TextBuffer,
+    pub temp_text_buffer: String,
     pub show_popup: bool,
     pub show_hidden_files: bool,
     pub session: Option<Session>,
@@ -30,6 +32,8 @@ impl ServerNavApp {
         self.show_file_tree(ctx);
         // File
         self.show_file(ctx);
+        // File operations
+        self.show_file_options(ctx);
         // Messages
         self.show_messages(ctx);
     }

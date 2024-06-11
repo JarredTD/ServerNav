@@ -70,7 +70,7 @@ impl ServerNavApp {
                                     self.current_wd = Some(full_path)
                                 } else if stat.is_file() {
                                     self.current_file = Some(full_path);
-                                    self.file_content = None;
+                                    self.file_text_buffer.content = None;
                                 }
                             }
                         }

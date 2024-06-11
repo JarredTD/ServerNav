@@ -7,7 +7,7 @@ use std::path::Path;
 impl ServerNavApp {
     pub fn show_file(&mut self, ctx: &Context) {
         if let (Some(session), Some(current_file)) = (&self.session, &self.current_file.clone()) {
-            if self.file_content.is_none() {
+            if self.file_text_buffer.content.is_none() {
                 match read_file(session, current_file) {
                     Ok(contents) => {
                         let file_name = match current_file.file_name() {
@@ -15,7 +15,8 @@ impl ServerNavApp {
                             None => String::from("Unknown"),
                         };
                         self.message = format!("Reading {}", file_name);
-                        self.file_content = Some(contents);
+                        self.file_text_buffer.content = Some(contents.clone());
+                        self.temp_text_buffer = contents
                     }
                     Err(err) => {
                         self.message =
@@ -24,23 +25,26 @@ impl ServerNavApp {
                     }
                 }
             }
-            if let Some(file_contents) = &mut self.file_content {
-                CentralPanel::default().show(ctx, |ui| {
-                    let theme = CodeTheme::from_memory(ui.ctx());
-                    ScrollArea::vertical().show(ui, |ui| {
-                        ui.add(
-                            egui::TextEdit::multiline(file_contents)
-                                .font(egui::TextStyle::Monospace)
-                                .code_editor()
-                                .layouter(&mut |ui, text, _| {
-                                    let layout_job =
-                                        highlight(ctx, &theme, text, &get_language(current_file));
-                                    ui.fonts(|fonts| fonts.layout_job(layout_job))
-                                }),
-                        );
-                    });
+            CentralPanel::default().show(ctx, |ui| {
+                let theme = CodeTheme::from_memory(ui.ctx());
+                let mut layouter = |ui: &egui::Ui, text: &str, _: f32| {
+                    let layout_job = highlight(ctx, &theme, text, &get_language(current_file));
+                    ui.fonts(|fonts| fonts.layout_job(layout_job))
+                };
+                ScrollArea::vertical().show(ui, |ui| {
+                    let editor = egui::TextEdit::multiline(&mut self.temp_text_buffer)
+                        .font(egui::TextStyle::Monospace)
+                        .code_editor()
+                        .layouter(&mut layouter);
+
+                    let response = ui.add(editor);
+
+                    if response.changed() {
+                        self.file_text_buffer
+                            .update_content(self.temp_text_buffer.clone());
+                    }
                 });
-            }
+            });
         }
     }
 }
