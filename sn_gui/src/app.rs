@@ -15,6 +15,7 @@ pub struct ServerNavApp {
     pub temp_text_buffer: String,
     pub show_connection_popup: bool,
     pub show_import_popup: bool,
+    pub show_export_popup: bool,
     pub show_hidden_files: bool,
     pub session: Option<Session>,
     pub selected_import_path: Option<PathBuf>,

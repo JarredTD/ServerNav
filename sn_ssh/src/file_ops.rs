@@ -1,4 +1,5 @@
 use ssh2::Session;
+use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
@@ -78,10 +79,47 @@ pub fn export_file(
     unimplemented!("Functionality to export files is not implemented yet.");
 }
 
-pub fn import_file(
-    _session: &Session,
-    _remote_path: &Path,
-    _local_path: &Path,
-) -> Result<(), String> {
-    unimplemented!("Functionality to import files is not implemented yet.");
+pub fn import_file(session: &Session, remote_dir: &Path, local_path: &Path) -> Result<(), String> {
+    let local_file_name = local_path.file_name().ok_or("Invalid local path")?;
+    let local_file_stem = local_file_name
+        .to_str()
+        .ok_or("Failed to convert file name to string")?;
+    let mut file_base = local_file_stem.to_string();
+    let mut extension = String::new();
+
+    if let Some(pos) = local_file_stem.rfind('.') {
+        file_base = local_file_stem[..pos].to_string();
+        extension = local_file_stem[pos..].to_string();
+    }
+
+    // Check for the file's existence and increment the filename if necessary
+    let sftp = session
+        .sftp()
+        .map_err(|e| format!("Failed to create SFTP session: {}", e))?;
+    let mut counter = 0;
+    let mut new_remote_path = remote_dir.join(local_file_name);
+
+    while sftp.stat(&new_remote_path).is_ok() {
+        counter += 1;
+        let new_file_name = format!("{}({}){}", file_base, counter, extension);
+        new_remote_path = remote_dir.join(new_file_name);
+    }
+
+    let mut local_file =
+        File::open(local_path).map_err(|e| format!("Failed to open local file: {}", e))?;
+    let mut buffer = Vec::new();
+
+    local_file
+        .read_to_end(&mut buffer)
+        .map_err(|e| format!("Failed to read local file: {}", e))?;
+
+    let mut remote_file = session
+        .scp_send(&new_remote_path, 0o644, buffer.len() as u64, None)
+        .map_err(|e| format!("Failed to start SCP send: {}", e))?;
+
+    remote_file
+        .write_all(&buffer)
+        .map_err(|e| format!("Failed to write to remote file: {}", e))?;
+
+    Ok(())
 }

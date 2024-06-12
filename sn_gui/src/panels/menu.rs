@@ -12,9 +12,6 @@ impl ServerNavApp {
                         self.show_connection_popup = true
                     }
                     if self.session.is_some() {
-                        if ui.button("Import").clicked() {
-                            self.show_import_popup = true;
-                        }
                         if ui.button("Disconnect").clicked() {
                             self.current_wd = None;
                             self.current_file = None;
@@ -22,6 +19,12 @@ impl ServerNavApp {
                                 Ok(msg) => self.message = msg,
                                 Err(err) => self.message = err,
                             }
+                        }
+                        if ui.button("Import File").clicked() {
+                            self.show_import_popup = true;
+                        }
+                        if ui.button("Export File").clicked() {
+                            self.show_import_popup = true;
                         }
                     }
                     if self.current_file.is_some() && ui.button("Save").clicked() {
