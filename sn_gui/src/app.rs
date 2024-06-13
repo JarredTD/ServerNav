@@ -37,6 +37,10 @@ impl ServerNavApp {
         if self.show_import_popup {
             self.show_import_menu(ctx)
         }
+        // Export Popup
+        if self.show_export_popup {
+            self.show_export_menu(ctx)
+        }
         // File Tree
         self.show_file_tree(ctx);
         // File

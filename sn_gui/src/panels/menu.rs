@@ -24,7 +24,7 @@ impl ServerNavApp {
                             self.show_import_popup = true;
                         }
                         if ui.button("Export File").clicked() {
-                            self.show_import_popup = true;
+                            self.show_export_popup = true;
                         }
                     }
                     if self.current_file.is_some() && ui.button("Save").clicked() {
