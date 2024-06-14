@@ -1,6 +1,6 @@
 use crate::app::ServerNavApp;
 use eframe::egui::{self, Context, Label, Sense};
-use sn_ssh::file_ops::list_dir;
+use sn_ssh::file_ops::directory::list_dir;
 use std::path::Path;
 
 impl ServerNavApp {

@@ -1,7 +1,7 @@
 use crate::app::ServerNavApp;
 use eframe::egui::{self, Align, Context, RichText};
 use sn_ssh::connection::{connect_to_ssh, disconnect_ssh};
-use sn_ssh::file_ops::get_working_dir;
+use sn_ssh::file_ops::directory::get_working_dir;
 
 impl ServerNavApp {
     pub fn show_connection_menu(&mut self, ctx: &Context) {

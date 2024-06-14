@@ -1,5 +1,5 @@
 use eframe::egui::{self};
-use sn_ssh::buffer::text_buffer::TextBuffer;
+use sn_ssh::containers::text_buffer::TextBuffer;
 use ssh2::Session;
 use std::path::PathBuf;
 

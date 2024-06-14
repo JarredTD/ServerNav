@@ -1,7 +1,7 @@
 use crate::app::ServerNavApp;
 use eframe::egui::{self, CentralPanel, Context, ScrollArea};
 use egui_extras::syntax_highlighting::{highlight, CodeTheme};
-use sn_ssh::file_ops::read_file;
+use sn_ssh::file_ops::file::read_file;
 use std::path::Path;
 
 impl ServerNavApp {

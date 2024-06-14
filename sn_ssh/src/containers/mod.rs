@@ -1,2 +1,2 @@
-pub mod storage;
+pub mod static_vec;
 pub mod text_buffer;

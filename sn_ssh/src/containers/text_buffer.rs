@@ -1,4 +1,4 @@
-use crate::buffer::storage::static_vec::BoundedVec;
+use crate::containers::static_vec::BoundedVec;
 use std::time::SystemTime;
 
 const MAX_VEC_CAPACITY: usize = 50;

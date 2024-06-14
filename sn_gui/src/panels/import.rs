@@ -1,6 +1,6 @@
 use crate::app::ServerNavApp;
 use eframe::egui::{self, Align, Context, RichText};
-use sn_ssh::file_ops::import_file;
+use sn_ssh::file_ops::import::import_file;
 
 impl ServerNavApp {
     pub fn show_import_menu(&mut self, ctx: &Context) {

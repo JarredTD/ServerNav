@@ -1,7 +1,7 @@
 use crate::app::ServerNavApp;
 use eframe::egui::{self, Context, Visuals};
 use sn_ssh::connection::disconnect_ssh;
-use sn_ssh::file_ops::modify_file;
+use sn_ssh::file_ops::file::modify_file;
 
 impl ServerNavApp {
     pub fn show_menu(&mut self, ctx: &Context) {
