@@ -37,7 +37,7 @@ impl ServerNavApp {
         }
         // Import File Popup
         if self.show_import_popup {
-            self.show_import_menu(ctx)
+            self.show_import_dir_menu(ctx)
         }
         // Export File Popup
         if self.show_export_popup {
