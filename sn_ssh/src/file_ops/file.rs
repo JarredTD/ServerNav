@@ -25,7 +25,7 @@ pub fn modify_file(session: &Session, filepath: &Path, content: &str) -> Result<
     let mut remote_file = sftp
         .open_mode(
             filepath,
-            ssh2::OpenFlags::WRITE,
+            ssh2::OpenFlags::WRITE | ssh2::OpenFlags::TRUNCATE,
             0o644,
             ssh2::OpenType::File,
         )
@@ -34,6 +34,14 @@ pub fn modify_file(session: &Session, filepath: &Path, content: &str) -> Result<
     remote_file
         .write_all(content.as_bytes())
         .map_err(|e| format!("Failed to write to file: {:?}", e))?;
+
+    remote_file
+        .flush()
+        .map_err(|e| format!("Failed to flush file buffer: {:?}", e))?;
+
+    remote_file
+        .close()
+        .map_err(|e| format!("Failed to close file: {:?}", e))?;
 
     Ok(())
 }
