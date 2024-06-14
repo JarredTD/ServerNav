@@ -11,3 +11,4 @@ egui_extras = "0.27.2"
 sn_ssh = { path = "../sn_ssh" }
 ssh2 = "0.9.4"
 rfd = "0.14.1"
+dirs = "5.0.1"

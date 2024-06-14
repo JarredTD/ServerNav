@@ -26,8 +26,16 @@ impl ServerNavApp {
                             self.show_import_popup = true;
                             ui.close_menu();
                         }
+                        if ui.button("Import Directory").clicked() {
+                            self.show_import_dir_popup = true;
+                            ui.close_menu();
+                        }
                         if self.current_file.is_some() && ui.button("Export File").clicked() {
                             self.show_export_popup = true;
+                            ui.close_menu();
+                        }
+                        if self.current_wd.is_some() && ui.button("Export Directory").clicked() {
+                            self.show_export_dir_popup = true;
                             ui.close_menu();
                         }
                     }

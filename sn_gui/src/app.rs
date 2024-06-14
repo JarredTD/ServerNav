@@ -16,6 +16,8 @@ pub struct ServerNavApp {
     pub show_connection_popup: bool,
     pub show_import_popup: bool,
     pub show_export_popup: bool,
+    pub show_import_dir_popup: bool,
+    pub show_export_dir_popup: bool,
     pub show_hidden_files: bool,
     pub session: Option<Session>,
     pub selected_import_path: Option<PathBuf>,
@@ -33,13 +35,21 @@ impl ServerNavApp {
         if self.show_connection_popup || self.session.is_none() {
             self.show_connection_menu(ctx);
         }
-        // Import Popup
+        // Import File Popup
         if self.show_import_popup {
             self.show_import_menu(ctx)
         }
-        // Export Popup
+        // Export File Popup
         if self.show_export_popup {
             self.show_export_menu(ctx)
+        }
+        // Import Directory Popup
+        if self.show_import_dir_popup {
+            self.show_import_dir_menu(ctx)
+        }
+        // Export Directory Popup
+        if self.show_export_dir_popup {
+            self.show_export_dir_menu(ctx)
         }
         // File Tree
         self.show_file_tree(ctx);

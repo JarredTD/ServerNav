@@ -4,7 +4,7 @@ use sn_ssh::file_ops::export_file;
 
 impl ServerNavApp {
     pub fn show_export_menu(&mut self, ctx: &Context) {
-        egui::Window::new("Import File")
+        egui::Window::new("Export File")
             .collapsible(false)
             .resizable(false)
             .default_pos(egui::pos2(
@@ -35,15 +35,17 @@ impl ServerNavApp {
                             if let (Some(selected_file), Some(session)) =
                                 (&self.current_file, &self.session)
                             {
-                                match export_file(session, selected_file) {
-                                    Ok(()) => {
-                                        self.message = format!(
-                                            "Successfully exported {}",
-                                            selected_file.display()
-                                        );
-                                        self.show_export_popup = false
+                                if let Some(downloads_folder) = dirs::download_dir() {
+                                    match export_file(session, selected_file, &downloads_folder) {
+                                        Ok(()) => {
+                                            self.message = format!(
+                                                "Successfully exported {}",
+                                                selected_file.display()
+                                            );
+                                            self.show_export_popup = false
+                                        }
+                                        Err(err) => self.message = err.to_string(),
                                     }
-                                    Err(err) => self.message = err.to_string(),
                                 }
                             }
                         }
