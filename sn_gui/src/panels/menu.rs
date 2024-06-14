@@ -26,7 +26,7 @@ impl ServerNavApp {
                             self.show_import_popup = true;
                             ui.close_menu();
                         }
-                        if ui.button("Export File").clicked() {
+                        if self.current_file.is_some() && ui.button("Export File").clicked() {
                             self.show_export_popup = true;
                             ui.close_menu();
                         }
