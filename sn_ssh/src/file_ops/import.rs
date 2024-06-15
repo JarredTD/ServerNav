@@ -53,10 +53,10 @@ fn import_directory_recursive(
 
 pub fn import_file(
     session: &Session,
-    remote_file_path: &Path,
-    local_path: &Path,
+    remote_directory: &Path,
+    local_file_path: &Path,
 ) -> Result<(), String> {
-    let local_file_name = local_path.file_name().ok_or("Invalid local path")?;
+    let local_file_name = local_file_path.file_name().ok_or("Invalid local path")?;
     let local_file_stem = local_file_name
         .to_str()
         .ok_or("Failed to convert file name to string")?;
@@ -72,17 +72,17 @@ pub fn import_file(
         .sftp()
         .map_err(|e| format!("Failed to create SFTP session: {}", e))?;
     let mut counter = 0;
-    let mut new_remote_path = remote_file_path.to_path_buf();
+    let mut new_remote_path = remote_directory.join(local_file_name);
 
     // Check for the file's existence and increment the filename if necessary
     while sftp.stat(&new_remote_path).is_ok() {
         counter += 1;
         let new_file_name = format!("{}({}){}", file_base, counter, extension);
-        new_remote_path = remote_file_path.with_file_name(new_file_name);
+        new_remote_path = remote_directory.join(new_file_name);
     }
 
     let mut local_file =
-        File::open(local_path).map_err(|e| format!("Failed to open local file: {}", e))?;
+        File::open(local_file_path).map_err(|e| format!("Failed to open local file: {}", e))?;
     let mut buffer = Vec::new();
 
     local_file
