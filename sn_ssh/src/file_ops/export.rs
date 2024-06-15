@@ -64,7 +64,7 @@ fn export_directory_recursive(
 pub fn export_file(
     session: &Session,
     remote_file_path: &Path,
-    local_file_path: &Path,
+    local_directory: &Path,
 ) -> Result<(), String> {
     let sftp = session
         .sftp()
@@ -79,8 +79,32 @@ pub fn export_file(
         .read_to_end(&mut buffer)
         .map_err(|e| format!("Failed to read remote file: {}", e))?;
 
-    let mut local_file =
-        File::create(local_file_path).map_err(|e| format!("Failed to create local file: {}", e))?;
+    let file_name = remote_file_path
+        .file_name()
+        .ok_or("Invalid remote file path")?;
+    let local_file_stem = file_name
+        .to_str()
+        .ok_or("Failed to convert file name to string")?;
+    let mut file_base = local_file_stem.to_string();
+    let mut extension = String::new();
+
+    if let Some(pos) = local_file_stem.rfind('.') {
+        file_base = local_file_stem[..pos].to_string();
+        extension = local_file_stem[pos..].to_string();
+    }
+
+    let mut counter = 0;
+    let mut new_local_file_path = local_directory.join(file_name);
+
+    // Check for the file's existence and increment the filename if necessary
+    while new_local_file_path.exists() {
+        counter += 1;
+        let new_file_name = format!("{}({}){}", file_base, counter, extension);
+        new_local_file_path = local_directory.join(new_file_name);
+    }
+
+    let mut local_file = File::create(&new_local_file_path)
+        .map_err(|e| format!("Failed to create local file: {}", e))?;
 
     local_file
         .write_all(&buffer)
